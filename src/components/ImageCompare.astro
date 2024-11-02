@@ -1,0 +1,80 @@
+---
+interface Props {
+  originalImage: string;
+  processedImage: string;
+}
+
+const { originalImage, processedImage } = Astro.props;
+---
+
+<div class="relative w-full aspect-video select-none">
+  <div class="absolute inset-0 overflow-hidden">
+    <img src={originalImage} alt="Original" class="w-full h-full object-cover" />
+  </div>
+  <div class="absolute inset-0 overflow-hidden comparison-overlay">
+    <img src={processedImage} alt="Processed" class="w-full h-full object-cover" />
+  </div>
+  <input 
+    type="range" 
+    min="0" 
+    max="100" 
+    value="50" 
+    class="absolute top-1/2 left-0 w-full slider"
+    id="slider"
+  />
+  <div class="handle"></div>
+</div>
+
+<style>
+  .comparison-overlay {
+    clip-path: inset(0 50% 0 0);
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 3px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    cursor: col-resize;
+  }
+
+  .handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 3px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    transform: translateX(-50%);
+  }
+</style>
+
+<script>
+  const slider = document.getElementById('slider') as HTMLInputElement;
+  const overlay = document.querySelector('.comparison-overlay') as HTMLElement;
+  const handle = document.querySelector('.handle') as HTMLElement;
+
+  function updateComparison(value: string) {
+    overlay.style.clipPath = `inset(0 ${100 - parseInt(value)}% 0 0)`;
+    handle.style.left = `${value}%`;
+  }
+
+  slider.addEventListener('input', (e) => {
+    const target = e.target as HTMLInputElement;
+    updateComparison(target.value);
+  });
+</script>
